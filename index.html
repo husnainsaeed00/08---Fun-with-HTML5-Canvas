@@ -1,28 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>HTML5 Canvas</title>
-  <link rel="icon" href="https://fav.farm/🔥" />
+  <title>Canvas Drawing</title>
+  <style>
+    html, body {
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
-<canvas id="draw" width="800" height="800"></canvas>
-<script>
-const canvas=document.querySelector("#draw");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-ctx.strokeStyle="#BADASS";
-ctx.lineJoin="round";
-ctx.lineCap="roundd";
+  <canvas id="draw"></canvas>
 
-</script>
+  <script>
+    const canvas = document.querySelector("#draw");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.strokeStyle = "#BADASS";
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round"; // Corrected 'lineCap' property
+    ctx.lineWidth = 100;
 
-<style>
-  html, body {
-    margin: 0;
-  }
-</style>
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let hue = 0;
+    let direction = true;
 
+    function draw(e) {
+      if (!isDrawing) return;
+      
+      ctx.beginPath();
+      ctx.strokeStyle=`hsl(${hue}, 100%, 50%)`
+      ctx.lineWidth=hue;
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(e.offsetX, e.offsetY); // Corrected 'offsetX' and 'offsetY'
+      ctx.stroke();
+      [lastX, lastY] = [e.offsetX, e.offsetY];
+      
+      hue++;
+      if (hue >= 360) {
+        hue = 0;
+      }
+      
+      if (ctx.lineWidth >= 150 || ctx.lineWidth <= 1) {
+        direction = !direction; // Corrected toggling of 'direction'
+      }
+      if (ctx.lineWidth >= 150) {
+        direction = false; // Ensures it doesn't exceed the maximum
+      } else if (ctx.lineWidth <= 1) {
+        direction = true; // Ensures it doesn't go below the minimum
+      }
+      if (direction) {
+        ctx.lineWidth++; // Increment lineWidth if direction is true
+      } else {
+        ctx.lineWidth--; // Decrement lineWidth if direction is false
+      }
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+      isDrawing = true;
+      [lastX, lastY] = [e.offsetX, e.offsetY]; // Corrected 'offsetX' and 'offsetY'
+    });
+
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseout', () => isDrawing = false);
+    canvas.addEventListener('mousemove', draw);
+  </script>
 </body>
 </html>
